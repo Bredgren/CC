@@ -1,6 +1,8 @@
 module Main exposing (main)
 
+import Data.Entry as Entry exposing (Entry, entryToHtml)
 import Html exposing (..)
+import Json.Decode exposing (decodeString)
 
 
 main : Program Never Model Msg
@@ -18,13 +20,13 @@ main =
 
 
 type alias Model =
-    { message : String
+    { entries : List Entry
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model "Hello there", Cmd.none )
+    ( Model [ Result.withDefault (Entry "" "" []) (decodeString Entry.decoder """{"date": "2017-1-1", "notes":"", "exercises":[]}""") ], Cmd.none )
 
 
 
@@ -39,7 +41,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NewMessage str ->
-            ( { model | message = str }, Cmd.none )
+            ( model, Cmd.none )
 
 
 
@@ -58,5 +60,6 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text model.message ]
+        [ h1 [] [ text "Entries" ]
+        , div [] (List.map entryToHtml model.entries)
         ]

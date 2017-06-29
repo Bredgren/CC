@@ -3,8 +3,10 @@ module Data.Entry
         ( Entry
         , decoder
         , encode
+        , entryToHtml
         )
 
+import Html
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline exposing (decode, required)
 import Json.Encode as Encode exposing (Value)
@@ -75,3 +77,8 @@ encodeSet set =
         [ "reps" => Encode.int set.reps
         , "warmup" => Encode.bool set.warmup
         ]
+
+
+entryToHtml : Entry -> Html.Html msg
+entryToHtml entry =
+    Html.text (toString entry)
