@@ -1,10 +1,12 @@
 module Main exposing (main)
 
 import Data.Entry as Entry exposing (Entry, entryToHtml)
+import FileReader as FR
 import Html
 import Html.Attributes as Attrs
 import Html.Events as Events
-import Json.Decode exposing (decodeString)
+import Json.Decode as JD
+import Task
 
 
 main : Program Never Model Msg
@@ -23,12 +25,21 @@ main =
 
 type alias Model =
     { entries : List Entry
+    , selectedFile : Maybe FR.NativeFile
+    , uploadedFileContents : String
+    , errors : List String
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model [ Result.withDefault (Entry "" "" []) (decodeString Entry.decoder """{"date": "2017-1-1", "notes":"This is notes. Hi.", "exercises":[]}""") ], Cmd.none )
+    ( { entries = [ Result.withDefault (Entry "" "" []) (JD.decodeString Entry.decoder """{"date": "2017-1-1", "notes":"This is notes. Hi.", "exercises":[]}""") ]
+      , selectedFile = Nothing
+      , uploadedFileContents = ""
+      , errors = []
+      }
+    , Cmd.none
+    )
 
 
 
@@ -36,18 +47,48 @@ init =
 
 
 type Msg
-    = NewMessage String
-    | Upload
+    = Upload
+    | FilesSelect (List FR.NativeFile)
+    | FileData (Result FR.Error String)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NewMessage str ->
-            ( model, Cmd.none )
-
         Upload ->
-            ( model, Cmd.none )
+            case model.selectedFile of
+                Just selected ->
+                    { model | errors = [] } ! [ readTextFile selected ]
+
+                Nothing ->
+                    { model | errors = [] } ! []
+
+        FilesSelect fileInstances ->
+            { model
+                | selectedFile = List.head fileInstances
+            }
+                ! []
+
+        FileData (Ok str) ->
+            let
+                data =
+                    JD.decodeString (JD.list Entry.decoder) str
+            in
+            case data of
+                Ok d ->
+                    { model | uploadedFileContents = str, entries = d } ! []
+
+                Err err ->
+                    { model | errors = (err ++ " :: " ++ str) :: model.errors } ! []
+
+        FileData (Err err) ->
+            { model | errors = FR.prettyPrint err :: model.errors } ! []
+
+
+readTextFile : FR.NativeFile -> Cmd Msg
+readTextFile fileValue =
+    FR.readAsTextFile fileValue.blob
+        |> Task.attempt FileData
 
 
 
@@ -68,11 +109,16 @@ view model =
     Html.div []
         [ Html.input
             [ Attrs.type_ "file"
-
-            -- , Events.onchange FilesSelect
+            , onchange FilesSelect
             ]
             []
         , Html.button [ Events.onClick Upload ] [ Html.text "Upload" ]
+        , Html.div [] [ Html.text <| "Errors: " ++ String.join ", " model.errors ]
         , Html.h2 [] [ Html.text "Entries" ]
         , Html.div [] (List.map entryToHtml model.entries)
         ]
+
+
+onchange : (List FR.NativeFile -> value) -> Html.Attribute value
+onchange action =
+    Events.on "change" (JD.map action FR.parseSelectedFiles)
