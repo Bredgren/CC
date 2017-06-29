@@ -33,7 +33,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { entries = [ Result.withDefault (Entry "" "" []) (JD.decodeString Entry.decoder """{"date": "2017-1-1", "notes":"This is notes. Hi.", "exercises":[]}""") ]
+    ( { entries = []
       , selectedFile = Nothing
       , uploadedFileContents = ""
       , errors = []

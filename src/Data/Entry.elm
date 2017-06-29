@@ -82,6 +82,31 @@ encodeSet set =
 entryToHtml : Entry -> Html.Html msg
 entryToHtml entry =
     Html.div []
-        [ Html.h1 [] [ Html.text entry.date ]
-        , Html.p [] [ Html.text entry.notes ]
+        [ Html.h2 [] [ Html.text entry.date ]
+        , Html.div [] (List.map exerciseToHtml entry.exercises)
+        , Html.div []
+            [ Html.h3 [] [ Html.text "Notes" ]
+            , Html.p [] [ Html.text entry.notes ]
+            ]
+        ]
+
+
+exerciseToHtml : Exercise -> Html.Html msg
+exerciseToHtml exercise =
+    Html.div []
+        [ Html.h3 [] [ Html.text exercise.name ]
+        , Html.ol [] (List.map setToHtml exercise.sets)
+        ]
+
+
+setToHtml : Set -> Html.Html msg
+setToHtml set =
+    Html.li []
+        [ Html.text
+            (if set.warmup then
+                "(w) "
+             else
+                ""
+            )
+        , Html.text (toString set.reps)
         ]
