@@ -1,7 +1,9 @@
 module Main exposing (main)
 
 import Data.Entry as Entry exposing (Entry, entryToHtml)
-import Html exposing (..)
+import Html
+import Html.Attributes as Attrs
+import Html.Events as Events
 import Json.Decode exposing (decodeString)
 
 
@@ -26,7 +28,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model [ Result.withDefault (Entry "" "" []) (decodeString Entry.decoder """{"date": "2017-1-1", "notes":"", "exercises":[]}""") ], Cmd.none )
+    ( Model [ Result.withDefault (Entry "" "" []) (decodeString Entry.decoder """{"date": "2017-1-1", "notes":"This is notes. Hi.", "exercises":[]}""") ], Cmd.none )
 
 
 
@@ -35,12 +37,16 @@ init =
 
 type Msg
     = NewMessage String
+    | Upload
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NewMessage str ->
+            ( model, Cmd.none )
+
+        Upload ->
             ( model, Cmd.none )
 
 
@@ -57,9 +63,16 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Html.Html Msg
 view model =
-    div []
-        [ h1 [] [ text "Entries" ]
-        , div [] (List.map entryToHtml model.entries)
+    Html.div []
+        [ Html.input
+            [ Attrs.type_ "file"
+
+            -- , Events.onchange FilesSelect
+            ]
+            []
+        , Html.button [ Events.onClick Upload ] [ Html.text "Upload" ]
+        , Html.h2 [] [ Html.text "Entries" ]
+        , Html.div [] (List.map entryToHtml model.entries)
         ]

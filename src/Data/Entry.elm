@@ -81,4 +81,7 @@ encodeSet set =
 
 entryToHtml : Entry -> Html.Html msg
 entryToHtml entry =
-    Html.text (toString entry)
+    Html.div []
+        [ Html.h1 [] [ Html.text entry.date ]
+        , Html.p [] [ Html.text entry.notes ]
+        ]
