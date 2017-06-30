@@ -7,6 +7,7 @@ import Html.Attributes as Attrs
 import Html.Events as Events
 import Json.Decode as JD
 import Task
+import Util exposing (showIf)
 
 
 main : Program Never Model Msg
@@ -28,6 +29,7 @@ type alias Model =
     , selectedFile : Maybe FR.NativeFile
     , uploadedFileContents : String
     , errors : List String
+    , editEntry : Maybe Entry
     }
 
 
@@ -37,6 +39,7 @@ init =
       , selectedFile = Nothing
       , uploadedFileContents = ""
       , errors = []
+      , editEntry = Nothing
       }
     , Cmd.none
     )
@@ -50,6 +53,7 @@ type Msg
     = Upload
     | FilesSelect (List FR.NativeFile)
     | FileData (Result FR.Error String)
+    | NewEntry
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -84,6 +88,9 @@ update msg model =
         FileData (Err err) ->
             { model | errors = FR.prettyPrint err :: model.errors } ! []
 
+        NewEntry ->
+            model ! []
+
 
 readTextFile : FR.NativeFile -> Cmd Msg
 readTextFile fileValue =
@@ -113,7 +120,7 @@ view model =
             ]
             []
         , Html.button [ Events.onClick Upload ] [ Html.text "Upload" ]
-        , Html.div [] [ Html.text <| "Errors: " ++ String.join ", " model.errors ]
+        , showIf (Html.div [] [ Html.text <| "Errors: " ++ String.join ", " model.errors ]) (List.length model.errors > 0)
         , Html.h2 [] [ Html.text "Entries" ]
         , Html.div [] (List.map entryToHtml model.entries)
         ]
