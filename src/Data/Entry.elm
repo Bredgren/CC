@@ -1,6 +1,8 @@
 module Data.Entry
     exposing
         ( Entry
+        , Exercise
+        , Set
         , decoder
         , encode
         , entryToHtml

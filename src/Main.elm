@@ -1,8 +1,10 @@
 module Main exposing (main)
 
-import Data.Entry as Entry exposing (Entry, entryToHtml)
+import Data.Entry as Entry
+import Data.Exercise as Exercise
 import Date
 import DatePicker exposing (defaultSettings)
+import Dict
 import FileReader as FR
 import Html
 import Html.Attributes as Attrs
@@ -27,11 +29,11 @@ main =
 
 
 type alias Model =
-    { entries : List Entry
+    { entries : List Entry.Entry
     , selectedFile : Maybe FR.NativeFile
     , uploadedFileContents : String
     , errors : List String
-    , editEntry : Maybe Entry
+    , editEntry : Maybe Entry.Entry
     , datePicker : DatePicker.DatePicker
     , date : Maybe Date.Date
     }
@@ -65,6 +67,11 @@ type Msg
     | FileData (Result FR.Error String)
     | NewEntry
     | SetDatePicker DatePicker.Msg
+    | SelectExercise String
+    | AddSet String
+      -- | EditSet String Int Int
+    | SetReps String Int Int
+    | SetWarmup String Int Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -100,7 +107,7 @@ update msg model =
             { model | errors = FR.prettyPrint err :: model.errors } ! []
 
         NewEntry ->
-            { model | editEntry = Just (Entry "" "" []) } ! []
+            { model | editEntry = Just (Entry.Entry "" "" []) } ! []
 
         SetDatePicker msg ->
             let
@@ -124,6 +131,64 @@ update msg model =
                 , editEntry = newEntry
             }
                 ! [ Cmd.map SetDatePicker datePickerCmd ]
+
+        SelectExercise exerciseName ->
+            let
+                newEntry =
+                    Maybe.map (\e -> { e | exercises = e.exercises ++ [ Entry.Exercise exerciseName [] ] }) model.editEntry
+            in
+            { model | editEntry = newEntry } ! []
+
+        AddSet exercise ->
+            let
+                updateExercise e =
+                    if e.name == exercise then
+                        { e | sets = e.sets ++ [ Entry.Set 0 False ] }
+                    else
+                        e
+
+                newEntry e =
+                    { e | exercises = List.map updateExercise e.exercises }
+            in
+            { model | editEntry = Maybe.map newEntry model.editEntry } ! []
+
+        SetReps exercise set reps ->
+            let
+                updateSet i s =
+                    if i == set then
+                        { s | reps = reps }
+                    else
+                        s
+
+                updateExercise e =
+                    if e.name == exercise then
+                        { e | sets = List.indexedMap updateSet e.sets }
+                    else
+                        e
+
+                newEntry e =
+                    { e | exercises = List.map updateExercise e.exercises }
+            in
+            { model | editEntry = Maybe.map newEntry model.editEntry } ! []
+
+        SetWarmup exercise set warmup ->
+            let
+                updateSet i s =
+                    if i == set then
+                        { s | warmup = warmup }
+                    else
+                        s
+
+                updateExercise e =
+                    if e.name == exercise then
+                        { e | sets = List.indexedMap updateSet e.sets }
+                    else
+                        e
+
+                newEntry e =
+                    { e | exercises = List.map updateExercise e.exercises }
+            in
+            { model | editEntry = Maybe.map newEntry model.editEntry } ! []
 
 
 datePickerSettings : DatePicker.Settings
@@ -164,12 +229,13 @@ view model =
         , Html.button [ Events.onClick Upload ] [ Html.text "Upload" ]
         , viewEditEntry model model.editEntry
         , showIf (Html.div [] [ Html.text <| "Errors: " ++ String.join ", " model.errors ]) (List.length model.errors > 0)
+        , Maybe.withDefault (Html.text "-") (Maybe.map Entry.entryToHtml model.editEntry)
         , Html.h2 [] [ Html.text "Entries" ]
-        , Html.div [] (List.map entryToHtml model.entries)
+        , Html.div [] (List.map Entry.entryToHtml model.entries)
         ]
 
 
-viewEditEntry : Model -> Maybe Entry -> Html.Html Msg
+viewEditEntry : Model -> Maybe Entry.Entry -> Html.Html Msg
 viewEditEntry model maybeEntry =
     case maybeEntry of
         Nothing ->
@@ -183,15 +249,34 @@ viewEditEntry model maybeEntry =
                     datePickerSettings
                     model.datePicker
                     |> Html.map SetDatePicker
+                , Html.div []
+                    [ exerciseSelect ""
+                    ]
 
-                -- [ Html.input [ Attrs.type_ "date", Events.on "select" (JD.map UpdateEditDate JD.string) ] []
-                , Html.text <| "Date: " ++ entry.date ++ ", " ++ dateToString model.date
+                -- , Html.text <| "Date: " ++ entry.date ++ ", " ++ dateToString model.date
                 ]
 
 
 onchange : (List FR.NativeFile -> value) -> Html.Attribute value
 onchange action =
     Events.on "change" (JD.map action FR.parseSelectedFiles)
+
+
+exerciseSelect : String -> Html.Html Msg
+exerciseSelect selected =
+    let
+        toOpt exerciseName =
+            Html.option [ Attrs.selected (selected == exerciseName) ]
+                [ Html.text exerciseName ]
+
+        toOptGroup ( groupName, exerciseList ) =
+            Html.optgroup [ Attrs.attribute "label" groupName ]
+                (List.map toOpt exerciseList)
+    in
+    Html.select
+        [ Events.on "change" (JD.map SelectExercise Events.targetValue)
+        ]
+        ([ Html.option [] [ Html.text "---" ] ] ++ List.map toOptGroup (Dict.toList Exercise.groups))
 
 
 dateToString : Maybe Date.Date -> String

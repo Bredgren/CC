@@ -1,4 +1,4 @@
-module Exercise exposing (..)
+module Data.Exercise exposing (..)
 
 import Dict
 
@@ -358,8 +358,8 @@ all =
         ]
 
 
-group : Dict.Dict String (List String)
-group =
+groups : Dict.Dict String (List String)
+groups =
     Dict.fromList
         [ ( "Pushups"
           , [ "Wall Pushups"
