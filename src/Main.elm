@@ -69,9 +69,13 @@ type Msg
     | SetDatePicker DatePicker.Msg
     | SelectExercise String
     | AddSet String
-      -- | EditSet String Int Int
+    | RemoveSet String Int
     | SetReps String Int Int
-    | SetWarmup String Int Bool
+    | ToggleWarmup String Int
+
+
+
+-- | SaveEntry
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -152,10 +156,23 @@ update msg model =
             in
             { model | editEntry = Maybe.map newEntry model.editEntry } ! []
 
-        SetReps exercise set reps ->
+        RemoveSet exercise setIndex ->
+            let
+                updateExercise e =
+                    if e.name == exercise then
+                        { e | sets = List.take setIndex e.sets ++ List.drop (setIndex + 1) e.sets }
+                    else
+                        e
+
+                newEntry e =
+                    { e | exercises = List.map updateExercise e.exercises }
+            in
+            { model | editEntry = Maybe.map newEntry model.editEntry } ! []
+
+        SetReps exercise setIndex reps ->
             let
                 updateSet i s =
-                    if i == set then
+                    if i == setIndex then
                         { s | reps = reps }
                     else
                         s
@@ -171,11 +188,11 @@ update msg model =
             in
             { model | editEntry = Maybe.map newEntry model.editEntry } ! []
 
-        SetWarmup exercise set warmup ->
+        ToggleWarmup exercise setIndex ->
             let
                 updateSet i s =
-                    if i == set then
-                        { s | warmup = warmup }
+                    if i == setIndex then
+                        { s | warmup = not s.warmup }
                     else
                         s
 
@@ -249,12 +266,54 @@ viewEditEntry model maybeEntry =
                     datePickerSettings
                     model.datePicker
                     |> Html.map SetDatePicker
+                , Html.div [] (List.map viewEditEntryExercise entry.exercises)
                 , Html.div []
                     [ exerciseSelect ""
                     ]
 
                 -- , Html.text <| "Date: " ++ entry.date ++ ", " ++ dateToString model.date
                 ]
+
+
+viewEditEntryExercise : Entry.Exercise -> Html.Html Msg
+viewEditEntryExercise exercise =
+    Html.div []
+        [ Html.h3 [] [ Html.text exercise.name ]
+        , Html.ol [] (List.indexedMap (viewEditEntrySet exercise.name) exercise.sets)
+        , Html.button [ Events.onClick (AddSet exercise.name) ] [ Html.text "+" ]
+        ]
+
+
+viewEditEntrySet : String -> Int -> Entry.Set -> Html.Html Msg
+viewEditEntrySet exerciseName setIndex set =
+    Html.li []
+        [ Html.input
+            [ Attrs.type_ "number"
+            , Attrs.min "0"
+            , Attrs.value (toString set.reps)
+            , onRepCountChange exerciseName setIndex
+            ]
+            []
+        , Html.label []
+            [ Html.input
+                [ Attrs.type_ "checkbox"
+                , Events.onClick (ToggleWarmup exerciseName setIndex)
+                ]
+                []
+            , Html.text "warmup"
+            ]
+        , Html.button [ Events.onClick (RemoveSet exerciseName setIndex) ]
+            [ Html.text "-" ]
+        ]
+
+
+onRepCountChange : String -> Int -> Html.Attribute Msg
+onRepCountChange exerciseName setNum =
+    let
+        targetToSetReps str =
+            SetReps exerciseName setNum (Result.withDefault 0 (String.toInt str))
+    in
+    Events.on "change" (JD.map targetToSetReps Events.targetValue)
 
 
 onchange : (List FR.NativeFile -> value) -> Html.Attribute value
