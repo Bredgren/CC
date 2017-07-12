@@ -66,16 +66,14 @@ type Msg
     | FilesSelect (List FR.NativeFile)
     | FileData (Result FR.Error String)
     | NewEntry
+      -- | SaveEntry
     | SetDatePicker DatePicker.Msg
     | SelectExercise String
+      -- | RemoveExercise String
     | AddSet String
     | RemoveSet String Int
     | SetReps String Int Int
     | ToggleWarmup String Int
-
-
-
--- | SaveEntry
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -268,7 +266,7 @@ viewEditEntry model maybeEntry =
                     |> Html.map SetDatePicker
                 , Html.div [] (List.map viewEditEntryExercise entry.exercises)
                 , Html.div []
-                    [ exerciseSelect ""
+                    [ exerciseSelect (List.map (\e -> e.name) (Maybe.withDefault (Entry.Entry "" "" []) model.editEntry).exercises)
                     ]
 
                 -- , Html.text <| "Date: " ++ entry.date ++ ", " ++ dateToString model.date
@@ -321,11 +319,11 @@ onchange action =
     Events.on "change" (JD.map action FR.parseSelectedFiles)
 
 
-exerciseSelect : String -> Html.Html Msg
-exerciseSelect selected =
+exerciseSelect : List String -> Html.Html Msg
+exerciseSelect alreadySelected =
     let
         toOpt exerciseName =
-            Html.option [ Attrs.selected (selected == exerciseName) ]
+            Html.option [ Attrs.disabled (List.member exerciseName alreadySelected) ]
                 [ Html.text exerciseName ]
 
         toOptGroup ( groupName, exerciseList ) =
@@ -335,7 +333,7 @@ exerciseSelect selected =
     Html.select
         [ Events.on "change" (JD.map SelectExercise Events.targetValue)
         ]
-        ([ Html.option [] [ Html.text "---" ] ] ++ List.map toOptGroup (Dict.toList Exercise.groups))
+        ([ Html.option [ Attrs.selected True, Attrs.disabled True ] [ Html.text "---" ] ] ++ List.map toOptGroup (Dict.toList Exercise.groups))
 
 
 dateToString : Maybe Date.Date -> String
