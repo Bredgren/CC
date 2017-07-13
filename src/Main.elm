@@ -66,7 +66,7 @@ type Msg
     | FilesSelect (List FR.NativeFile)
     | FileData (Result FR.Error String)
     | NewEntry
-      -- | SaveEntry
+    | SaveEntry
     | SetDatePicker DatePicker.Msg
     | SelectExercise String
     | RemoveExercise String
@@ -110,6 +110,18 @@ update msg model =
 
         NewEntry ->
             { model | editEntry = Just (Entry.Entry "" "" []) } ! []
+
+        SaveEntry ->
+            let
+                newModel =
+                    case model.editEntry of
+                        Just entry ->
+                            { model | entries = entry :: model.entries, editEntry = Nothing }
+
+                        Nothing ->
+                            model
+            in
+            newModel ! []
 
         SetDatePicker msg ->
             let
@@ -275,8 +287,7 @@ viewEditEntry model maybeEntry =
                 , Html.div []
                     [ exerciseSelect (List.map (\e -> e.name) (Maybe.withDefault (Entry.Entry "" "" []) model.editEntry).exercises)
                     ]
-
-                -- , Html.text <| "Date: " ++ entry.date ++ ", " ++ dateToString model.date
+                , Html.button [ Events.onClick SaveEntry ] [ Html.text "Save" ]
                 ]
 
 
