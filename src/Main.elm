@@ -69,7 +69,7 @@ type Msg
       -- | SaveEntry
     | SetDatePicker DatePicker.Msg
     | SelectExercise String
-      -- | RemoveExercise String
+    | RemoveExercise String
     | AddSet String
     | RemoveSet String Int
     | SetReps String Int Int
@@ -138,6 +138,13 @@ update msg model =
             let
                 newEntry =
                     Maybe.map (\e -> { e | exercises = e.exercises ++ [ Entry.Exercise exerciseName [] ] }) model.editEntry
+            in
+            { model | editEntry = newEntry } ! []
+
+        RemoveExercise exerciseName ->
+            let
+                newEntry =
+                    Maybe.map (\e -> { e | exercises = List.filter (\e -> e.name /= exerciseName) e.exercises }) model.editEntry
             in
             { model | editEntry = newEntry } ! []
 
@@ -276,7 +283,10 @@ viewEditEntry model maybeEntry =
 viewEditEntryExercise : Entry.Exercise -> Html.Html Msg
 viewEditEntryExercise exercise =
     Html.div []
-        [ Html.h3 [] [ Html.text exercise.name ]
+        [ Html.h3 []
+            [ Html.text exercise.name
+            , Html.button [ Events.onClick (RemoveExercise exercise.name) ] [ Html.text "-" ]
+            ]
         , Html.ol [] (List.indexedMap (viewEditEntrySet exercise.name) exercise.sets)
         , Html.button [ Events.onClick (AddSet exercise.name) ] [ Html.text "+" ]
         ]
@@ -333,7 +343,12 @@ exerciseSelect alreadySelected =
     Html.select
         [ Events.on "change" (JD.map SelectExercise Events.targetValue)
         ]
-        ([ Html.option [ Attrs.selected True, Attrs.disabled True ] [ Html.text "---" ] ] ++ List.map toOptGroup (Dict.toList Exercise.groups))
+        ([ Html.option
+            [ Attrs.selected True, Attrs.disabled True ]
+            [ Html.text "---" ]
+         ]
+            ++ List.map toOptGroup (Dict.toList Exercise.groups)
+        )
 
 
 dateToString : Maybe Date.Date -> String
