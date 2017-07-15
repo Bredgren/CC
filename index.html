@@ -13,18 +13,20 @@
   </head>
   <body id="page-body">
     <script>
-      var app = Elm.Main.fullscreen();
-      // var app = Elm.Main.fullscreen(localStorage.session || null);
+      var app = Elm.Main.fullscreen(localStorage.log || "");
 
-      // app.ports.storeSession.subscribe(function(session) {
-      //   localStorage.session = session;
-      // });
-      //
+      app.ports.saveLog.subscribe(function(log) {
+        localStorage.log = log;
+      });
+
       // window.addEventListener("storage", function(event) {
-      //   if (event.storageArea === localStorage && event.key === "session") {
-      //     app.ports.onSessionChange.send(event.newValue);
+      //   if (event.storageArea === localStorage && event.key === "log") {
+      //     app.ports.onLogChange.send(event.newValue);
       //   }
       // }, false);
+      app.ports.doLoadLog.subscribe(function() {
+        app.ports.loadLog.send(localStorage.getItem(storageKey));
+      });
     </script>
   </body>
 </html>

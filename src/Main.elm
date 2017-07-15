@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Data.Entry as Entry
 import Data.Exercise as Exercise
@@ -10,13 +10,17 @@ import Html
 import Html.Attributes as Attrs
 import Html.Events as Events
 import Json.Decode as JD
+import Json.Encode as JE
 import Task
 import Util exposing (showIf)
 
 
-main : Program Never Model Msg
+-- TODO: localstorage, edit previous entries using date picker
+
+
+main : Program String Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , view = view
         , update = update
@@ -39,13 +43,13 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
+init : String -> ( Model, Cmd Msg )
+init initLogStr =
     let
         ( datePicker, datePickerCmd ) =
             DatePicker.init
     in
-    ( { entries = []
+    ( { entries = JD.decodeString (JD.list Entry.decoder) initLogStr |> Result.withDefault []
       , selectedFile = Nothing
       , uploadedFileContents = ""
       , errors = []
@@ -63,6 +67,9 @@ init =
 
 type Msg
     = Upload
+    | SaveLog
+    | DoLoadLog
+    | DoLoad String
     | FilesSelect (List FR.NativeFile)
     | FileData (Result FR.Error String)
     | NewEntry
@@ -86,6 +93,24 @@ update msg model =
                 Nothing ->
                     { model | errors = [] } ! []
 
+        SaveLog ->
+            model ! [ save model ]
+
+        DoLoadLog ->
+            model ! [ doLoadLog () ]
+
+        DoLoad logStr ->
+            let
+                data =
+                    JD.decodeString (JD.list Entry.decoder) logStr
+            in
+            case data of
+                Ok entries ->
+                    { model | entries = entries } ! []
+
+                Err err ->
+                    { model | errors = (err ++ " :: " ++ logStr) :: model.errors } ! []
+
         FilesSelect fileInstances ->
             { model
                 | selectedFile = List.head fileInstances
@@ -96,13 +121,16 @@ update msg model =
             let
                 data =
                     JD.decodeString (JD.list Entry.decoder) str
-            in
-            case data of
-                Ok d ->
-                    { model | uploadedFileContents = str, entries = d } ! []
 
-                Err err ->
-                    { model | errors = (err ++ " :: " ++ str) :: model.errors } ! []
+                newModel =
+                    case data of
+                        Ok d ->
+                            { model | uploadedFileContents = str, entries = d }
+
+                        Err err ->
+                            { model | errors = (err ++ " :: " ++ str) :: model.errors }
+            in
+            newModel ! [ save newModel ]
 
         FileData (Err err) ->
             { model | errors = FR.prettyPrint err :: model.errors } ! []
@@ -120,7 +148,7 @@ update msg model =
                         Nothing ->
                             model
             in
-            newModel ! []
+            newModel ! [ save newModel ]
 
         SetDatePicker msg ->
             let
@@ -247,8 +275,22 @@ readTextFile fileValue =
         |> Task.attempt FileData
 
 
+save : Model -> Cmd msg
+save model =
+    saveLog <| JE.encode 0 <| JE.list <| List.map Entry.encode model.entries
+
+
 
 -- SUBSCRIPTIONS
+
+
+port saveLog : String -> Cmd msg
+
+
+port loadLog : (String -> msg) -> Sub msg
+
+
+port doLoadLog : () -> Cmd msg
 
 
 subscriptions : Model -> Sub Msg
