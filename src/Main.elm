@@ -68,8 +68,7 @@ type Msg
     | NewEntry
     | SaveEntry
     | SetDatePicker DatePicker.Msg
-    | SelectExercise String
-    | RemoveExercise String
+    | ToggleExercise String
     | AddSet String
     | RemoveSet String Int
     | SetReps String Int Int
@@ -146,19 +145,28 @@ update msg model =
             }
                 ! [ Cmd.map SetDatePicker datePickerCmd ]
 
-        SelectExercise exerciseName ->
-            let
-                newEntry =
-                    Maybe.map (\e -> { e | exercises = e.exercises ++ [ Entry.Exercise exerciseName [] ] }) model.editEntry
-            in
-            { model | editEntry = newEntry } ! []
+        ToggleExercise exerciseName ->
+            case model.editEntry of
+                Nothing ->
+                    model ! []
 
-        RemoveExercise exerciseName ->
-            let
-                newEntry =
-                    Maybe.map (\e -> { e | exercises = List.filter (\e -> e.name /= exerciseName) e.exercises }) model.editEntry
-            in
-            { model | editEntry = newEntry } ! []
+                Just entry ->
+                    let
+                        isPresent =
+                            List.member exerciseName (List.map (\s -> s.name) entry.exercises)
+                    in
+                    if isPresent then
+                        let
+                            newEntry =
+                                Maybe.map (\e -> { e | exercises = List.filter (\e -> e.name /= exerciseName) e.exercises }) model.editEntry
+                        in
+                        { model | editEntry = newEntry } ! []
+                    else
+                        let
+                            newEntry =
+                                Maybe.map (\e -> { e | exercises = e.exercises ++ [ Entry.Exercise exerciseName [] ] }) model.editEntry
+                        in
+                        { model | editEntry = newEntry } ! []
 
         AddSet exercise ->
             let
@@ -283,10 +291,8 @@ viewEditEntry model maybeEntry =
                     datePickerSettings
                     model.datePicker
                     |> Html.map SetDatePicker
+                , Html.fieldset [] (List.map exerciseGroupSelect (Dict.keys Exercise.groups))
                 , Html.div [] (List.map viewEditEntryExercise entry.exercises)
-                , Html.div []
-                    [ exerciseSelect (List.map (\e -> e.name) (Maybe.withDefault (Entry.Entry "" "" []) model.editEntry).exercises)
-                    ]
                 , Html.button [ Events.onClick SaveEntry ] [ Html.text "Save" ]
                 ]
 
@@ -294,10 +300,7 @@ viewEditEntry model maybeEntry =
 viewEditEntryExercise : Entry.Exercise -> Html.Html Msg
 viewEditEntryExercise exercise =
     Html.div []
-        [ Html.h3 []
-            [ Html.text exercise.name
-            , Html.button [ Events.onClick (RemoveExercise exercise.name) ] [ Html.text "-" ]
-            ]
+        [ Html.h3 [] [ Html.text exercise.name ]
         , Html.ol [] (List.indexedMap (viewEditEntrySet exercise.name) exercise.sets)
         , Html.button [ Events.onClick (AddSet exercise.name) ] [ Html.text "+" ]
         ]
@@ -340,26 +343,20 @@ onchange action =
     Events.on "change" (JD.map action FR.parseSelectedFiles)
 
 
-exerciseSelect : List String -> Html.Html Msg
-exerciseSelect alreadySelected =
-    let
-        toOpt exerciseName =
-            Html.option [ Attrs.disabled (List.member exerciseName alreadySelected) ]
-                [ Html.text exerciseName ]
-
-        toOptGroup ( groupName, exerciseList ) =
-            Html.optgroup [ Attrs.attribute "label" groupName ]
-                (List.map toOpt exerciseList)
-    in
-    Html.select
-        [ Events.on "change" (JD.map SelectExercise Events.targetValue)
+exerciseGroupSelect : String -> Html.Html Msg
+exerciseGroupSelect groupName =
+    Html.div []
+        [ Html.h3 [] [ Html.text groupName ]
+        , Html.div [] (List.map exerciseSelect <| Maybe.withDefault [] <| Dict.get groupName Exercise.groups)
         ]
-        ([ Html.option
-            [ Attrs.selected True, Attrs.disabled True ]
-            [ Html.text "---" ]
-         ]
-            ++ List.map toOptGroup (Dict.toList Exercise.groups)
-        )
+
+
+exerciseSelect : String -> Html.Html Msg
+exerciseSelect exercise =
+    Html.label []
+        [ Html.input [ Attrs.type_ "checkbox", Events.onClick <| ToggleExercise exercise ] []
+        , Html.text exercise
+        ]
 
 
 dateToString : Maybe Date.Date -> String
