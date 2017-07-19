@@ -15,7 +15,7 @@ import Task
 import Util exposing (showIf)
 
 
--- TODO: localstorage, edit previous entries using date picker
+-- TODO: edit previous entries using date picker
 
 
 main : Program String Model Msg
@@ -57,7 +57,10 @@ init initLogStr =
       , datePicker = datePicker
       , date = Nothing
       }
-    , Cmd.map SetDatePicker datePickerCmd
+    , Cmd.batch
+        [ Cmd.map SetDatePicker datePickerCmd
+        , Task.perform SetTime Date.now
+        ]
     )
 
 
@@ -66,7 +69,8 @@ init initLogStr =
 
 
 type Msg
-    = Upload
+    = SetTime Date.Date
+    | Upload
     | SaveLog
     | DoLoadLog
     | DoLoad String
@@ -85,6 +89,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        SetTime date ->
+            { model | date = Just date } ! []
+
         Upload ->
             case model.selectedFile of
                 Just selected ->
@@ -136,7 +143,7 @@ update msg model =
             { model | errors = FR.prettyPrint err :: model.errors } ! []
 
         NewEntry ->
-            { model | editEntry = Just (Entry.Entry "" "" []) } ! []
+            { model | editEntry = Just (Entry.Entry (dateToString model.date) "" []) } ! []
 
         SaveEntry ->
             let
