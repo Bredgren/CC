@@ -15,9 +15,6 @@ import Task
 import Util exposing (showIf)
 
 
--- TODO: edit previous entries using date picker
-
-
 main : Program String Model Msg
 main =
     Html.programWithFlags
@@ -170,8 +167,19 @@ update msg model =
                         DatePicker.Changed newDate ->
                             newDate
 
+                strDate =
+                    dateToString date
+
+                existingEntry =
+                    List.head <| List.filter (\e -> e.date == strDate) model.entries
+
                 newEntry =
-                    Maybe.map (\e -> { e | date = dateToString date }) model.editEntry
+                    case existingEntry of
+                        Nothing ->
+                            Debug.log (toString <| model.entries) <| Maybe.map (\e -> { e | date = strDate }) model.editEntry
+
+                        Just entry ->
+                            Debug.log entry.notes existingEntry
             in
             { model
                 | date = date
@@ -369,6 +377,7 @@ viewEditEntrySet exerciseName setIndex set =
             [ Html.input
                 [ Attrs.type_ "checkbox"
                 , Events.onClick (ToggleWarmup exerciseName setIndex)
+                , Attrs.checked set.warmup
                 ]
                 []
             , Html.text "warmup"
@@ -451,7 +460,11 @@ dateToString d =
     in
     case d of
         Just date ->
-            toString (Date.year date) ++ "-" ++ monthToInt (Date.month date) ++ "-" ++ toString (Date.day date)
+            String.join "-"
+                [ toString (Date.year date)
+                , String.padLeft 2 '0' <| monthToInt (Date.month date)
+                , String.padLeft 2 '0' <| toString (Date.day date)
+                ]
 
         Nothing ->
             "no date"
