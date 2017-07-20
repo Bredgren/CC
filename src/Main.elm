@@ -143,16 +143,24 @@ update msg model =
             { model | editEntry = Just (Entry.Entry (dateToString model.date) "" []) } ! []
 
         SaveEntry ->
-            let
-                newModel =
-                    case model.editEntry of
-                        Just entry ->
-                            { model | entries = entry :: model.entries, editEntry = Nothing }
+            case model.editEntry of
+                Nothing ->
+                    model ! []
 
-                        Nothing ->
-                            model
-            in
-            newModel ! [ save newModel ]
+                Just editEntry ->
+                    let
+                        entries =
+                            List.filter (\e -> e.date /= editEntry.date) model.entries
+
+                        newModel =
+                            case model.editEntry of
+                                Just entry ->
+                                    { model | entries = List.reverse <| List.sortBy .date (entry :: entries), editEntry = Nothing }
+
+                                Nothing ->
+                                    model
+                    in
+                    newModel ! [ save newModel ]
 
         SetDatePicker msg ->
             let
@@ -176,10 +184,10 @@ update msg model =
                 newEntry =
                     case existingEntry of
                         Nothing ->
-                            Debug.log (toString <| model.entries) <| Maybe.map (\e -> { e | date = strDate }) model.editEntry
+                            Maybe.map (\e -> { e | date = strDate }) model.editEntry
 
                         Just entry ->
-                            Debug.log entry.notes existingEntry
+                            existingEntry
             in
             { model
                 | date = date
@@ -348,7 +356,7 @@ viewEditEntry model maybeEntry =
                     datePickerSettings
                     model.datePicker
                     |> Html.map SetDatePicker
-                , Html.fieldset [] (List.map exerciseGroupSelect (Dict.keys Exercise.groups))
+                , Html.fieldset [] (List.map (exerciseGroupSelect entry) (Dict.keys Exercise.groups))
                 , Html.div [] (List.map viewEditEntryExercise entry.exercises)
                 , Html.button [ Events.onClick SaveEntry ] [ Html.text "Save" ]
                 ]
@@ -401,18 +409,23 @@ onchange action =
     Events.on "change" (JD.map action FR.parseSelectedFiles)
 
 
-exerciseGroupSelect : String -> Html.Html Msg
-exerciseGroupSelect groupName =
+exerciseGroupSelect : Entry.Entry -> String -> Html.Html Msg
+exerciseGroupSelect editEntry groupName =
     Html.div []
         [ Html.h3 [] [ Html.text groupName ]
-        , Html.div [] (List.map exerciseSelect <| Maybe.withDefault [] <| Dict.get groupName Exercise.groups)
+        , Html.div [] (List.map (exerciseSelect editEntry) <| Maybe.withDefault [] <| Dict.get groupName Exercise.groups)
         ]
 
 
-exerciseSelect : String -> Html.Html Msg
-exerciseSelect exercise =
+exerciseSelect : Entry.Entry -> String -> Html.Html Msg
+exerciseSelect editEntry exercise =
     Html.label []
-        [ Html.input [ Attrs.type_ "checkbox", Events.onClick <| ToggleExercise exercise ] []
+        [ Html.input
+            [ Attrs.type_ "checkbox"
+            , Events.onClick <| ToggleExercise exercise
+            , Attrs.checked (List.member exercise (List.map .name editEntry.exercises))
+            ]
+            []
         , Html.text exercise
         ]
 
