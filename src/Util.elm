@@ -1,4 +1,4 @@
-module Util exposing ((=>), showIf)
+module Util exposing ((=>), indexOf, showIf)
 
 import Html
 
@@ -20,3 +20,16 @@ showIf html condition =
         html
     else
         Html.text ""
+
+
+indexOf : a -> List a -> Maybe Int
+indexOf item list =
+    case list of
+        [] ->
+            Nothing
+
+        x :: xs ->
+            if x == item then
+                Just 0
+            else
+                Maybe.map ((+) 1) (indexOf item xs)

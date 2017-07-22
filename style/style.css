@@ -1,0 +1,9 @@
+.progress-area {
+	display: flex;
+}
+
+.progress-block {
+  float: left;
+  text-align: center;
+  margin: 5px;
+}

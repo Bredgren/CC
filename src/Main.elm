@@ -15,6 +15,9 @@ import Task
 import Util exposing (showIf)
 
 
+-- TODO: tell how far from progression
+
+
 main : Program String Model Msg
 main =
     Html.programWithFlags
@@ -334,6 +337,7 @@ view model =
             ]
             []
         , Html.button [ Events.onClick Upload ] [ Html.text "Upload" ]
+        , viewProgress model
         , viewEditEntry model model.editEntry
         , showIf (Html.div [] [ Html.text <| "Errors: " ++ String.join ", " model.errors ]) (List.length model.errors > 0)
         , Maybe.withDefault (Html.text "-") (Maybe.map Entry.entryToHtml model.editEntry)
@@ -428,6 +432,51 @@ exerciseSelect editEntry exercise =
             []
         , Html.text exercise
         ]
+
+
+viewProgress : Model -> Html.Html Msg
+viewProgress model =
+    let
+        getExercise groupName entry =
+            let
+                belongsToGroup exercise =
+                    List.member exercise.name (Maybe.withDefault [] <| Dict.get groupName Exercise.groups)
+
+                hasNoWarmups exercise =
+                    List.all (\s -> not s.warmup) exercise.sets
+
+                valid exercise =
+                    hasNoWarmups exercise && belongsToGroup exercise
+            in
+            List.head <| List.filter valid entry.exercises
+
+        lastExercise groupName =
+            List.head <| List.filterMap (getExercise groupName) model.entries
+
+        exerciseRank groupName exercise =
+            Dict.get groupName Exercise.groups
+                |> Maybe.andThen (Util.indexOf exercise)
+                |> Maybe.map ((+) 1)
+                |> Maybe.withDefault 0
+
+        viewExercise groupName maybeExercise =
+            case maybeExercise of
+                Nothing ->
+                    Html.text "None"
+
+                Just exercise ->
+                    Html.div []
+                        [ Html.h4 [] [ Html.text <| toString <| exerciseRank groupName exercise.name ]
+                        , Html.text exercise.name
+                        ]
+
+        viewGroup groupName =
+            Html.div [ Attrs.class "progress-block" ]
+                [ Html.h3 [] [ Html.text groupName ]
+                , viewExercise groupName <| lastExercise groupName
+                ]
+    in
+    Html.div [ Attrs.class "progress-area" ] <| List.map viewGroup <| Dict.keys Exercise.groups
 
 
 dateToString : Maybe Date.Date -> String
