@@ -459,6 +459,16 @@ viewProgress model =
                 |> Maybe.map ((+) 1)
                 |> Maybe.withDefault 0
 
+        viewSets exercise =
+            let
+                currProg =
+                    Entry.currentProgression exercise
+
+                viewSet set =
+                    Just <| Html.li [] [ Html.text <| toString set.reps ]
+            in
+            Html.ol [] <| List.filterMap viewSet <| List.take currProg.sets exercise.sets
+
         viewExercise groupName maybeExercise =
             case maybeExercise of
                 Nothing ->
@@ -468,6 +478,7 @@ viewProgress model =
                     Html.div []
                         [ Html.h4 [] [ Html.text <| toString <| exerciseRank groupName exercise.name ]
                         , Html.text exercise.name
+                        , viewSets exercise
                         ]
 
         viewGroup groupName =

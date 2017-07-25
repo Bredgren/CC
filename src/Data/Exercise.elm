@@ -3,357 +3,357 @@ module Data.Exercise exposing (..)
 import Dict
 
 
-type alias Standard =
-    { sets : Int
+type Standard
+    = Beginner
+    | Intermediate
+    | Progression
+
+
+type alias ProgressionStandard =
+    { standard : Standard
+    , sets : Int
     , reps : Int
     }
 
 
-type alias Desc =
-    { beginnerStandard : Standard
-    , intermediateStandard : Standard
-    , progressionStandard : Standard
-    }
-
-
-all : Dict.Dict String Desc
+all : Dict.Dict String (List ProgressionStandard)
 all =
     Dict.fromList
         [ ( "Wall Pushups"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 25 }
-            , progressionStandard = { sets = 3, reps = 50 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 25
+            , ProgressionStandard Progression 3 50
+            ]
           )
         , ( "Incline Pushups"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 20 }
-            , progressionStandard = { sets = 3, reps = 40 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 20
+            , ProgressionStandard Progression 3 40
+            ]
           )
         , ( "Kneeling Pushups"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 15 }
-            , progressionStandard = { sets = 3, reps = 30 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 15
+            , ProgressionStandard Progression 3 30
+            ]
           )
         , ( "Half Pushups"
-          , { beginnerStandard = { sets = 1, reps = 8 }
-            , intermediateStandard = { sets = 2, reps = 12 }
-            , progressionStandard = { sets = 2, reps = 25 }
-            }
+          , [ ProgressionStandard Beginner 1 8
+            , ProgressionStandard Intermediate 2 12
+            , ProgressionStandard Progression 2 25
+            ]
           )
         , ( "Full Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Close Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Uneven Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Half One-Arm Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Lever Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "One-Arm Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 1, reps = 100 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 1 100
+            ]
           )
         , ( "Shoulderstand Squats"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 25 }
-            , progressionStandard = { sets = 3, reps = 50 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 25
+            , ProgressionStandard Progression 3 50
+            ]
           )
         , ( "Jackknife Squats"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 20 }
-            , progressionStandard = { sets = 3, reps = 40 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 20
+            , ProgressionStandard Progression 3 40
+            ]
           )
         , ( "Supported Squats"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 15 }
-            , progressionStandard = { sets = 3, reps = 30 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 15
+            , ProgressionStandard Progression 3 30
+            ]
           )
         , ( "Half Squats"
-          , { beginnerStandard = { sets = 1, reps = 8 }
-            , intermediateStandard = { sets = 2, reps = 35 }
-            , progressionStandard = { sets = 2, reps = 50 }
-            }
+          , [ ProgressionStandard Beginner 1 8
+            , ProgressionStandard Intermediate 2 35
+            , ProgressionStandard Progression 2 50
+            ]
           )
         , ( "Full Squats"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 30 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 30
+            ]
           )
         , ( "Close Squats"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Uneven Squats"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Half One-Leg Squats"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Assisted One-Leg Squats"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "One-Leg Squats"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 50 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 50
+            ]
           )
         , ( "Vertical Pulls"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 20 }
-            , progressionStandard = { sets = 3, reps = 40 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 20
+            , ProgressionStandard Progression 3 40
+            ]
           )
         , ( "Horizontal Pulls"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 20 }
-            , progressionStandard = { sets = 3, reps = 30 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 20
+            , ProgressionStandard Progression 3 30
+            ]
           )
         , ( "Jackknife Pulls"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 15 }
-            , progressionStandard = { sets = 3, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 15
+            , ProgressionStandard Progression 3 20
+            ]
           )
         , ( "Half Pullups"
-          , { beginnerStandard = { sets = 1, reps = 8 }
-            , intermediateStandard = { sets = 2, reps = 11 }
-            , progressionStandard = { sets = 2, reps = 15 }
-            }
+          , [ ProgressionStandard Beginner 1 8
+            , ProgressionStandard Intermediate 2 11
+            , ProgressionStandard Progression 2 15
+            ]
           )
         , ( "Full Pullups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 8 }
-            , progressionStandard = { sets = 2, reps = 10 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 8
+            , ProgressionStandard Progression 2 10
+            ]
           )
         , ( "Close Pullups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 8 }
-            , progressionStandard = { sets = 2, reps = 10 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 8
+            , ProgressionStandard Progression 2 10
+            ]
           )
         , ( "Uneven Pullups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 7 }
-            , progressionStandard = { sets = 2, reps = 9 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 7
+            , ProgressionStandard Progression 2 9
+            ]
           )
         , ( "Half One-Arm Pullups"
-          , { beginnerStandard = { sets = 1, reps = 4 }
-            , intermediateStandard = { sets = 2, reps = 6 }
-            , progressionStandard = { sets = 2, reps = 8 }
-            }
+          , [ ProgressionStandard Beginner 1 4
+            , ProgressionStandard Intermediate 2 6
+            , ProgressionStandard Progression 2 8
+            ]
           )
         , ( "Assisted One-Arm Pullups"
-          , { beginnerStandard = { sets = 1, reps = 3 }
-            , intermediateStandard = { sets = 2, reps = 5 }
-            , progressionStandard = { sets = 2, reps = 7 }
-            }
+          , [ ProgressionStandard Beginner 1 3
+            , ProgressionStandard Intermediate 2 5
+            , ProgressionStandard Progression 2 7
+            ]
           )
         , ( "One-Arm Pullups"
-          , { beginnerStandard = { sets = 1, reps = 1 }
-            , intermediateStandard = { sets = 2, reps = 3 }
-            , progressionStandard = { sets = 2, reps = 6 }
-            }
+          , [ ProgressionStandard Beginner 1 1
+            , ProgressionStandard Intermediate 2 3
+            , ProgressionStandard Progression 2 6
+            ]
           )
         , ( "Knee Tucks"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 25 }
-            , progressionStandard = { sets = 3, reps = 40 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 25
+            , ProgressionStandard Progression 3 40
+            ]
           )
         , ( "Flat Knee Raises"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 20 }
-            , progressionStandard = { sets = 3, reps = 35 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 20
+            , ProgressionStandard Progression 3 35
+            ]
           )
         , ( "Flat Frog Raises"
-          , { beginnerStandard = { sets = 1, reps = 8 }
-            , intermediateStandard = { sets = 2, reps = 15 }
-            , progressionStandard = { sets = 3, reps = 25 }
-            }
+          , [ ProgressionStandard Beginner 1 8
+            , ProgressionStandard Intermediate 2 15
+            , ProgressionStandard Progression 3 25
+            ]
           )
         , ( "Flat Straight Leg Raises"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Hanging Knee Raises"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 15 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 15
+            ]
           )
         , ( "Hanging Bent Leg Raises"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 15 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 15
+            ]
           )
         , ( "Partial Straight Leg Raises"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 15 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 15
+            ]
           )
         , ( "Hanging Straight Leg Raises"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 30 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 30
+            ]
           )
         , ( "Short Bridges"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 25 }
-            , progressionStandard = { sets = 3, reps = 50 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 25
+            , ProgressionStandard Progression 3 50
+            ]
           )
         , ( "Straight Bridges"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 2, reps = 20 }
-            , progressionStandard = { sets = 3, reps = 40 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 2 20
+            , ProgressionStandard Progression 3 40
+            ]
           )
         , ( "Head Bridges"
-          , { beginnerStandard = { sets = 1, reps = 8 }
-            , intermediateStandard = { sets = 2, reps = 15 }
-            , progressionStandard = { sets = 2, reps = 25 }
-            }
+          , [ ProgressionStandard Beginner 1 8
+            , ProgressionStandard Intermediate 2 15
+            , ProgressionStandard Progression 2 25
+            ]
           )
         , ( "Full Bridges"
-          , { beginnerStandard = { sets = 1, reps = 6 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 15 }
-            }
+          , [ ProgressionStandard Beginner 1 6
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 15
+            ]
           )
         , ( "Wall Walking Bridges (Down)"
-          , { beginnerStandard = { sets = 1, reps = 3 }
-            , intermediateStandard = { sets = 2, reps = 6 }
-            , progressionStandard = { sets = 2, reps = 10 }
-            }
+          , [ ProgressionStandard Beginner 1 3
+            , ProgressionStandard Intermediate 2 6
+            , ProgressionStandard Progression 2 10
+            ]
           )
         , ( "Wall Walking Bridges (Up)"
-          , { beginnerStandard = { sets = 1, reps = 2 }
-            , intermediateStandard = { sets = 2, reps = 4 }
-            , progressionStandard = { sets = 2, reps = 8 }
-            }
+          , [ ProgressionStandard Beginner 1 2
+            , ProgressionStandard Intermediate 2 4
+            , ProgressionStandard Progression 2 8
+            ]
           )
         , ( "Closing Bridges"
-          , { beginnerStandard = { sets = 1, reps = 1 }
-            , intermediateStandard = { sets = 2, reps = 3 }
-            , progressionStandard = { sets = 2, reps = 6 }
-            }
+          , [ ProgressionStandard Beginner 1 1
+            , ProgressionStandard Intermediate 2 3
+            , ProgressionStandard Progression 2 6
+            ]
           )
         , ( "Stand-To-Stand Bridges"
-          , { beginnerStandard = { sets = 1, reps = 1 }
-            , intermediateStandard = { sets = 2, reps = 3 }
-            , progressionStandard = { sets = 2, reps = 30 }
-            }
+          , [ ProgressionStandard Beginner 1 1
+            , ProgressionStandard Intermediate 2 3
+            , ProgressionStandard Progression 2 30
+            ]
           )
         , ( "Wall Headstands"
-          , { beginnerStandard = { sets = 1, reps = 30 }
-            , intermediateStandard = { sets = 1, reps = 60 }
-            , progressionStandard = { sets = 1, reps = 120 }
-            }
+          , [ ProgressionStandard Beginner 1 30
+            , ProgressionStandard Intermediate 1 60
+            , ProgressionStandard Progression 1 120
+            ]
           )
         , ( "Crow Stands"
-          , { beginnerStandard = { sets = 1, reps = 10 }
-            , intermediateStandard = { sets = 1, reps = 30 }
-            , progressionStandard = { sets = 1, reps = 60 }
-            }
+          , [ ProgressionStandard Beginner 1 10
+            , ProgressionStandard Intermediate 1 30
+            , ProgressionStandard Progression 1 60
+            ]
           )
         , ( "Wall Handstands"
-          , { beginnerStandard = { sets = 1, reps = 30 }
-            , intermediateStandard = { sets = 1, reps = 60 }
-            , progressionStandard = { sets = 1, reps = 120 }
-            }
+          , [ ProgressionStandard Beginner 1 30
+            , ProgressionStandard Intermediate 1 60
+            , ProgressionStandard Progression 1 120
+            ]
           )
         , ( "Half Handstand Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 20 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 20
+            ]
           )
         , ( "Handstand Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 10 }
-            , progressionStandard = { sets = 2, reps = 15 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 10
+            , ProgressionStandard Progression 2 15
+            ]
           )
         , ( "Close Handstand Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 9 }
-            , progressionStandard = { sets = 2, reps = 12 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 9
+            , ProgressionStandard Progression 2 12
+            ]
           )
         , ( "Uneven Handstand Pushups"
-          , { beginnerStandard = { sets = 1, reps = 5 }
-            , intermediateStandard = { sets = 2, reps = 8 }
-            , progressionStandard = { sets = 2, reps = 10 }
-            }
+          , [ ProgressionStandard Beginner 1 5
+            , ProgressionStandard Intermediate 2 8
+            , ProgressionStandard Progression 2 10
+            ]
           )
         , ( "Half One-Arm Handstand Pushups"
-          , { beginnerStandard = { sets = 1, reps = 4 }
-            , intermediateStandard = { sets = 2, reps = 6 }
-            , progressionStandard = { sets = 2, reps = 8 }
-            }
+          , [ ProgressionStandard Beginner 1 4
+            , ProgressionStandard Intermediate 2 6
+            , ProgressionStandard Progression 2 8
+            ]
           )
         , ( "Lever Handstand Pushups"
-          , { beginnerStandard = { sets = 1, reps = 3 }
-            , intermediateStandard = { sets = 2, reps = 4 }
-            , progressionStandard = { sets = 2, reps = 6 }
-            }
+          , [ ProgressionStandard Beginner 1 3
+            , ProgressionStandard Intermediate 2 4
+            , ProgressionStandard Progression 2 6
+            ]
           )
         , ( "One-Arm Handstand Pushups"
-          , { beginnerStandard = { sets = 1, reps = 1 }
-            , intermediateStandard = { sets = 2, reps = 2 }
-            , progressionStandard = { sets = 1, reps = 5 }
-            }
+          , [ ProgressionStandard Beginner 1 1
+            , ProgressionStandard Intermediate 2 2
+            , ProgressionStandard Progression 1 5
+            ]
           )
         ]
 
@@ -440,3 +440,16 @@ groups =
             ]
           )
         ]
+
+
+progressionByGroup : Dict.Dict String (List ( String, ProgressionStandard ))
+progressionByGroup =
+    let
+        exerciseToProgressions exerciseName =
+            Dict.get exerciseName all
+                |> Maybe.withDefault []
+                |> List.map (\p -> ( exerciseName, p ))
+    in
+    Dict.toList groups
+        |> List.map (\g -> ( Tuple.first g, List.concatMap exerciseToProgressions (Tuple.second g) ))
+        |> Dict.fromList

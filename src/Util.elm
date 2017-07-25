@@ -1,4 +1,4 @@
-module Util exposing ((=>), indexOf, showIf)
+module Util exposing (..)
 
 import Html
 
@@ -33,3 +33,16 @@ indexOf item list =
                 Just 0
             else
                 Maybe.map ((+) 1) (indexOf item xs)
+
+
+lastItem : List a -> Maybe a
+lastItem list =
+    case list of
+        [] ->
+            Nothing
+
+        [ x ] ->
+            Just x
+
+        _ :: xs ->
+            lastItem xs
